@@ -33,19 +33,18 @@ ADDON_FANART = ADDON.getAddonInfo('fanart')
 ADDON_ICON = ADDON.getAddonInfo('icon')
 ADDON_NAME = ADDON.getAddonInfo('name') # name in addons.xml
 ADDON_VERSION = ADDON.getAddonInfo('version') # version in addons.xml
-FAVOURITES = os.path.join(xbmcvfs.translatePath('special://userdata/'), 'favourites.xml') # count
-FAVOURITES_FILE = os.path.join('special://userdata/', 'favourites.xml') # processing
+FAVOURITES = os.path.join(xbmcvfs.translatePath('special://userdata/'), 'favourites.xml')
 FAVOURITES_RESULT = 'ordfav.result'
 PLUGIN_ID = int(sys.argv[1])
 PLUGIN_URL = sys.argv[0]
 REORDER = os.path.join(ADDON.getAddonInfo('path'), 'resources', 'media', 'reorder.png')
-TEXT_ADDON = ADDON.getSetting('TEXT_ADDON')
-TEXT_DARK = ADDON.getSetting('TEXT_DARK')
-TEXT_DIM = ADDON.getSetting('TEXT_DIM')
-TEXT_GENERAL = ADDON.getSetting('TEXT_GENERAL')
-TEXT_HIGHLIGHT = ADDON.getSetting('TEXT_HIGHLIGHT')
-TEXT_ITEM = ADDON.getSetting('TEXT_ITEM')
-TEXT_VALUE = ADDON.getSetting('TEXT_VALUE')
+TEXT_ADDON = ADDON.getSetting('text_addon')
+TEXT_DARK = ADDON.getSetting('text_dark')
+TEXT_DIM = ADDON.getSetting('text_dim')
+TEXT_GENERAL = ADDON.getSetting('text_general')
+TEXT_HIGHLIGHT = ADDON.getSetting('text_highlight')
+TEXT_ITEM = ADDON.getSetting('text_item')
+TEXT_VALUE = ADDON.getSetting('text_value')
 THUMBNAILS_FORMAT = 'special://thumbnails/{folder}/{file}'
 
 # ============================================================
@@ -62,8 +61,8 @@ Log_Title = ('[COLOR %s]%s [/COLOR]' % (TEXT_ADDON, ADDON_NAME))
 # FUNCTION: Log
 # ============================================================
 
-def Log(msg, level = xbmc.LOGDEBUG):
-	xbmc.log(msg, level = level)
+def Log(message, level = xbmc.LOGDEBUG):
+	xbmc.log(message, level = level)
 
 # ============================================================
 # FUNCTION: TextBox
@@ -83,7 +82,7 @@ ACTION_NAV_BACK = 92 # Backspace action
 ACTION_PREVIOUS_MENU = 10 # ESC action
 ACTION_SELECT_ITEM = 7 # Number Pad Enter
 
-def TextBox(title, msg):
+def TextBox(title, text):
 	class TextBoxes(xbmcgui.WindowXMLDialog):
 
 		def onAction(self, action):
@@ -91,24 +90,24 @@ def TextBox(title, msg):
 			elif action == ACTION_NAV_BACK: self.close()
 
 		def onClick(self, controlId):
-			if (controlId == self.okbutton):
+			if (controlId == self.close_button):
 				self.close()
-			elif controlId != self.okbutton:
+			elif controlId != self.close_button:
 				self.noop = lambda: None
 
 		def onInit(self): # group = 8000, background = 8100, noop = 8181
-			self.title = 8200 # header
-			self.msg = 8300 # textbox
-			self.scrollbar = 8400 # scrollbar
-			self.okbutton = 8500 # close button
+			self.title = 8200
+			self.text = 8300
+			self.scrollbar = 8400
+			self.close_button = 8500
 			self.noop = lambda: None
 			self.showDialog()
 
 		def showDialog(self):
 			close = '[COLOR %s]Close[/COLOR]' % TEXT_GENERAL
 			self.getControl(self.title).setLabel(title)
-			self.getControl(self.okbutton).setLabel(close)
-			self.getControl(self.msg).setText(msg)
+			self.getControl(self.close_button).setLabel(close)
+			self.getControl(self.text).setText(text)
 			self.setFocusId(self.scrollbar)
 
 	textbox = TextBoxes("Textbox.xml", ADDON.getAddonInfo('path'), 'default')
@@ -151,11 +150,11 @@ INSTRUCTIONS_TEXT = '%s[CR][CR]Open the add-on to access the menu.[CR]Click on \
 
 NOTES_TEXT = '[CR][CR][CR]%s[CR][CR]Default X image displayed where thumbnail is unavailable.[CR]Up to two lines of fixed text displayed below an image (from start of favourite text).[CR]Up to three lines of scrolling text displayed when the cursor is on an image (from start to end of favourite text).[CR]\'Save + Reload\' may crash Kodi if there is a large number of favourites (i.e. large favourites.xml file). Profile reload automatically runs Kodi startup.' % ' '.join('NOTES')
 
-SETTINGS_TEXT = '[CR][CR][CR]%s[CR][CR]Click on \'Reorder Favourites Settings >\' to open the user settings.[CR]Customise text colours with billions of text colour combinations[CR][CR]Choose from 140 colours for each one (there is also a none option):[CR]TEXT_ADDON = header (menu, logs and text boxes)[CR]TEXT_DARK = menu, logs and text boxes[CR]TEXT_DIM = menu[CR]TEXT_GENERAL = main text (menu, logs, text boxes and buttons)[CR]TEXT_HIGHLIGHT = logs and text boxes[CR]TEXT_ITEM = text boxes[CR]TEXT_VALUE = text boxes[CR][CR]Press the OK button in settings to save any changes made and after resetting a category to default. Restart the add-on to see the changes.' % ' '.join('SETTINGS')
+SETTINGS_TEXT = '[CR][CR][CR]%s[CR][CR]Press the OK button in settings to save any changes made and after resetting a category to default.[CR]Some changes may require restarting the add-on.[CR][CR]Customise text colours with billions of text colour combinations[CR][CR]Choose from 140 colours for each one (there is also a none option):[CR]Text Add-on Colour: header (menu, notifications, logs and text boxes)[CR]Text Dark Colour: logs and text boxes[CR]Text Dim Colour: menu[CR]Text General Colour: main text (notifications, logs, text boxes and close button)[CR]Text Highlight Colour: values on menu requiring attention and logs[CR]Text Item Colour: items on menu and text boxes[CR]Text Value Colour: values on menu and text boxes' % ' '.join('SETTINGS')
 
-ENVIRONMENT_TEXT = '[CR][CR][CR]%s[CR][CR]Kodi v21.3 Omega apk (Android app) with Confluence skin as default (including default font).[CR]Tablet (1340 x 800 aspect ratio 5:3) running Android 14 using QuickEdit apk (TryItAndSee / LearnAsYouGo iterative development and testing).[CR]Chromecast HD (1280 x 720 aspect ratio 16:9) running Android TV OS version 14 (user testing).[CR]100%% tested and working on Android.[CR]Not tested on other platforms.[CR]Code debugged and reengineered using https://aipy.dev/tools where required.' % ' '.join('DEVELOPMENT ENVIRONMENT')
+ENVIRONMENT_TEXT = '[CR][CR][CR]%s[CR][CR]Kodi v21.3 Omega apk (Android app) with Confluence skin as default (including default font).[CR]Tablet (1340 x 800 aspect ratio 5:3) running Android 14 using QuickEdit apk (TryItAndSee / LearnAsYouGo iterative development and testing).[CR]Chromecast HD (1280 x 720 aspect ratio 16:9) running Android TV OS version 14 (user testing).[CR]100%% tested and working on Android.[CR]Not tested on other platforms.[CR]Code debugged and reengineered using https://aipy.dev/tools where required (pre 1.6.0).[CR]Code debugged and reengineered using https://stackoverflow.com/ai-assist (1.6.0 onwards).' % ' '.join('DEVELOPMENT ENVIRONMENT')
 
-CHANGELOG_TEXT = '[CR][CR][CR]%s [LIGHT] (newest at the top)[/LIGHT][CR][CR]Version code x.y.z attributes (1.5.0 onwards)[CR]x = major change / y = number of \'>\' menu items / z = minor change[CR][CR]version 3.4.0 (4 menu items & 2 user interface buttons)[CR]- reorder favourites code improved to retrieve more thumbnails[CR][CR]version 2.4.0 (4 menu items & 2 user interface buttons)[CR]- save and exit options removed from menu[CR]- save and exit options added using dialogue boxes[CR][CR]version 1.6.0 (6 menu items & 2 user interface buttons)[CR]- settings created to customise text colours with billions of text colour combinations[CR]- text colour customisation includes text boxes and user interface buttons[CR]- added favourite and interface row count to user interface header[CR]- added dummy button containing full favourite text to user interface[CR]- minor changes to menu text formats to improve consistency with other add-ons[CR]- minor changes to function names to improve consistency with other add-ons[CR]- logs reworked[CR][CR]version 1.5.1 (5 menu items & 2 user interface buttons)[CR]- minor changes to menu text formats to improve consistency with other add-ons[CR][CR]version 1.5.0 (5 menu items & 2 user interface buttons)[CR]- Textbox.xml background image name change[CR]- minor changes to improve consistency with other add-ons[CR][CR]version 1.2.4 (4 menu items for user interface & 2 user interface buttons)[CR]- menu updated with User Information dialogue box (Instructions / Notes / Development / Changelog)[CR]- menu updated with Developer, Name, Version and Addon ID[CR]- user interface ids in xml renumbered[CR]- user interface remote scrolling within borders[CR]- user interface images and layout improved[CR]- variables and functions reworked[CR]- dialogue boxes and logs reworked[CR]- simplified addon.xml content to reduce maintenance[CR][CR]version 1.0.0 (4 menu items for user interface & 2 user interface buttons)[CR]- code from Order Favourites 1.2.3a by doko-desuka (plugin.program.orderfavourites)[CR]- user interface resized to full screen[CR]- improved layout using new images and default image[CR]- visible scrollbar and resized text[CR]- menu and dialogue boxes reworked[CR]- user instructions added to addon.xml[CR]- icon.png changed and fanart.jpg added' % ' '.join('CHANGELOG')
+CHANGELOG_TEXT = '[CR][CR][CR]%s [LIGHT] (newest at the top)[/LIGHT][CR][CR]Version code x.y.z attributes (1.5.0 onwards)[CR]x = major change / y = number of \'>\' menu items / z = minor change[CR][CR]version 3.4.0 (4 menu items & 2 user interface buttons)[CR]- settings reworked to avoid clashes (different names to variables etc.)[CR]- minor changes to ReorderFavourites.xml and TextBox.xml to improve performance and consistency with other add-ons[CR]- minor changes to Log and TextBox functions to improve consistency with other add-ons[CR]- reorder favourites code improved to retrieve more thumbnails[CR][CR]version 2.4.0 (4 menu items & 2 user interface buttons)[CR]- save and exit options removed from menu[CR]- save and exit options added using dialogue boxes[CR][CR]version 1.6.0 (6 menu items & 2 user interface buttons)[CR]- settings created to customise text colours with billions of text colour combinations[CR]- text colour customisation includes text boxes and user interface buttons[CR]- added favourite and interface row count to user interface header[CR]- added dummy button containing full favourite text to user interface[CR]- minor changes to menu text formats to improve consistency with other add-ons[CR]- minor changes to function names to improve consistency with other add-ons[CR]- logs reworked[CR][CR]version 1.5.1 (5 menu items & 2 user interface buttons)[CR]- minor changes to menu text formats to improve consistency with other add-ons[CR][CR]version 1.5.0 (5 menu items & 2 user interface buttons)[CR]- Textbox.xml background image name change[CR]- minor changes to improve consistency with other add-ons[CR][CR]version 1.2.4 (4 menu items for user interface & 2 user interface buttons)[CR]- menu updated with User Information dialogue box (Instructions / Notes / Development / Changelog)[CR]- menu updated with Developer, Name, Version and Addon ID[CR]- user interface ids in xml renumbered[CR]- user interface remote scrolling within borders[CR]- user interface images and layout improved[CR]- variables and functions reworked[CR]- dialogue boxes and logs reworked[CR]- simplified addon.xml content to reduce maintenance[CR][CR]version 1.0.0 (4 menu items for user interface & 2 user interface buttons)[CR]- code from Order Favourites 1.2.3a by doko-desuka (plugin.program.orderfavourites)[CR]- user interface resized to full screen[CR]- improved layout using new images and default image[CR]- visible scrollbar and resized text[CR]- menu and dialogue boxes reworked[CR]- user instructions added to addon.xml[CR]- icon.png changed and fanart.jpg added' % ' '.join('CHANGELOG')
 
 User_Information_Text = '[COLOR %s][B]%s[/B][CR][COLOR %s][LIGHT](Instructions / Notes / Settings / Development Environment / Changelog)[/LIGHT][/COLOR][/COLOR][CR][CR][COLOR %s]%s[/COLOR]' % (TEXT_ITEM, ' '.join('USER INFORMATION'), TEXT_VALUE, TEXT_GENERAL, (INSTRUCTIONS_TEXT + NOTES_TEXT + SETTINGS_TEXT + ENVIRONMENT_TEXT + CHANGELOG_TEXT))
 
@@ -446,7 +445,7 @@ def Save_Favourites(xmlText):
 		return False
 
 	try:
-		file = xbmcvfs.File(FAVOURITES_FILE, 'w')
+		file = xbmcvfs.File(FAVOURITES, 'w')
 		file.write(xmlText)
 		file.close()
 
